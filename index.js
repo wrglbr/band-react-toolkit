@@ -16,7 +16,10 @@ import PropTypes from "prop-types";
 import classnames from "classnames";
 
 const isForwardRefComponent = (component) => {
-  return typeof component === 'object' && component['$$typeof'] === Symbol.for('react.forward_ref')
+  return (
+    typeof component === "object" &&
+    component["$$typeof"] === Symbol.for("react.forward_ref")
+  );
 };
 
 class ReactWizard extends React.Component {
@@ -86,7 +89,8 @@ class ReactWizard extends React.Component {
         for (var i = this.state.currentStep; i < key; i++) {
           if (
             this.refs[this.props.steps[i].stepName].isValidated !== undefined &&
-            await this.refs[this.props.steps[i].stepName].isValidated() === false
+            (await this.refs[this.props.steps[i].stepName].isValidated()) ===
+              false
           ) {
             validationState = false;
             break;
@@ -117,9 +121,9 @@ class ReactWizard extends React.Component {
       (this.props.validate &&
         ((this.refs[this.props.steps[this.state.currentStep].stepName]
           .isValidated !== undefined &&
-          await this.refs[
+          (await this.refs[
             this.props.steps[this.state.currentStep].stepName
-          ].isValidated()) ||
+          ].isValidated())) ||
           this.refs[this.props.steps[this.state.currentStep].stepName]
             .isValidated === undefined)) ||
       this.props.validate === undefined ||
@@ -170,9 +174,9 @@ class ReactWizard extends React.Component {
       (this.props.validate &&
         ((this.refs[this.props.steps[this.state.currentStep].stepName]
           .isValidated !== undefined &&
-          await this.refs[
+          (await this.refs[
             this.props.steps[this.state.currentStep].stepName
-          ].isValidated()) ||
+          ].isValidated())) ||
           this.refs[this.props.steps[this.state.currentStep].stepName]
             .isValidated === undefined) &&
         this.props.finishButtonClick !== undefined)
@@ -223,7 +227,7 @@ class ReactWizard extends React.Component {
     move_distance = move_distance * index_temp;
 
     if (mobile_device) {
-      vertical_level = parseInt(index / 2);
+      vertical_level = parseInt(index / 2, 2);
       vertical_level = vertical_level * 38;
     }
 
@@ -243,16 +247,17 @@ class ReactWizard extends React.Component {
 
   renderComponent(prop) {
     const { component, stepProps, stepName } = prop;
-    if (typeof component === 'function' || isForwardRefComponent(component)) {
+    if (typeof component === "function" || isForwardRefComponent(component)) {
       return (
         <prop.component
-            ref={stepName}
-            wizardData={this.state.wizardData}
-            {...stepProps}
-        />);
+          ref={stepName}
+          wizardData={this.state.wizardData}
+          {...stepProps}
+        />
+      );
     }
 
-    return (<div ref={stepName}>{component}</div>);
+    return <div ref={stepName}>{component}</div>;
   }
 
   render() {
@@ -290,8 +295,7 @@ class ReactWizard extends React.Component {
                         )}
                         onClick={() => this.navigationStepChange(key)}
                       >
-                        {prop.stepIcon !== undefined &&
-                        prop.stepIcon !== "" ? (
+                        {prop.stepIcon !== undefined && prop.stepIcon !== "" ? (
                           <i className={prop.stepIcon} />
                         ) : null}
                         {this.props.progressbar ? (
@@ -417,11 +421,16 @@ ReactWizard.propTypes = {
     PropTypes.shape({
       stepName: PropTypes.string.isRequired,
       stepIcon: PropTypes.string,
-      component: PropTypes.oneOfType([PropTypes.func, function (props, key, componentName, location, propFullName) {
-        if (!isForwardRefComponent(props.component)) {
-          return new Error(`Invalid prop ${propFullName} supplied to ${componentName}. Validation failed.`);
+      component: PropTypes.oneOfType([
+        PropTypes.func,
+        function (props, key, componentName, location, propFullName) {
+          if (!isForwardRefComponent(props.component)) {
+            return new Error(
+              `Invalid prop ${propFullName} supplied to ${componentName}. Validation failed.`
+            );
+          }
         }
-      }]),
+      ]),
       stepProps: PropTypes.object
     })
   ).isRequired
